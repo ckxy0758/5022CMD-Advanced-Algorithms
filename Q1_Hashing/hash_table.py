@@ -76,9 +76,15 @@ class HashTable:
     # ------------------------------------------------------------------ #
     @staticmethod
     def _polynomial_hash(key, capacity):
-        """Polynomial rolling hash over the characters of str(key).
+        """Polynomial rolling hash with a multiplicative mixing step.
 
-        h = (c0*31^(n-1) + c1*31^(n-2) + ... + c(n-1)) mod capacity
+        Step 1 - polynomial hash over the characters of str(key):
+                 h = c0*31^(n-1) + c1*31^(n-2) + ... + c(n-1)   (kept to 32 bits)
+        Step 2 - mix the bits (Knuth's multiplicative method), so keys that
+                 differ only slightly (P1001, P1002, ...) are scattered across
+                 the table instead of landing in neighbouring slots. Without
+                 this, sequential IDs formed long clusters (primary clustering).
+        Step 3 - reduce to a slot index with mod capacity.
 
         Written by hand instead of using Python's built-in hash(), because
         hash() of a string is randomised on every run, which would make slot
@@ -86,8 +92,10 @@ class HashTable:
         """
         h = 0
         for ch in str(key):
-            h = (h * 31 + ord(ch)) % capacity
-        return h
+            h = (h * 31 + ord(ch)) & 0xFFFFFFFF   # & 0xFFFFFFFF keeps h within 32 bits
+        h = (h * 2654435761) & 0xFFFFFFFF          # Knuth's constant (about 2^32 / golden ratio)
+        h ^= h >> 16                               # fold high bits into the low bits
+        return h % capacity
 
     @staticmethod
     def _is_prime(n):
@@ -235,6 +243,10 @@ class HashTable:
     @property
     def capacity(self):
         return self._capacity
+
+    def home_slot(self, key):
+        """Slot the key hashes to before any probing (its 'home' slot)."""
+        return self._home_index(key)
 
     @property
     def load_factor(self):

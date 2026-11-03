@@ -1,5 +1,3 @@
-"""Unit tests for hash_table.py. Run with:  python -m unittest test_hash_table -v"""
-
 import unittest
 
 from hash_table import HashTable, SlotState, DuplicateKeyError
