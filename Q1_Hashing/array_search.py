@@ -1,6 +1,4 @@
 """
-array_search.py
----------------
 Linear search on a one-dimensional array (Python list).
 Used for comparison with the hash table (Question 1, Task 4).
 """

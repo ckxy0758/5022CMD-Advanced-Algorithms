@@ -1,6 +1,4 @@
 """
-experiment.py
--------------
 Question 1, Task 4: compare search performance of the hash table (linear
 probing) with a one-dimensional array (Python list + linear search).
 

@@ -1,6 +1,4 @@
 """
-inventory_system.py
--------------------
 Command-line Pharmacy Inventory System (Question 1, Task 3).
 
 Two layers:

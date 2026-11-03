@@ -1,6 +1,4 @@
 """
-hash_table.py
--------------
 A generic hash table using Open Addressing with Linear Probing.
 
 The table knows nothing about pharmacy products: keys can be any value that
