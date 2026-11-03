@@ -22,8 +22,6 @@ class _Slot:
     Each slot stores at most one key-value pair, because open addressing
     resolves collisions by moving to another slot instead of chaining.
     """
-    __slots__ = ("key", "value", "state")   # fixed attributes: less memory per slot
-
     def __init__(self):
         self.key = None
         self.value = None
@@ -44,7 +42,8 @@ class HashTable:
     """
 
     DEFAULT_CAPACITY = 31          # prime number: spreads keys more evenly under modulo
-    DEFAULT_MAX_LOAD_FACTOR = 0.7  # resize before probe chains get long
+    DEFAULT_MAX_LOAD_FACTOR = 0.5  # resize before probe chains get long
+    HASH_BASE = 37                 # prime base for Horner's method (must differ from capacity)
 
     def __init__(self, capacity=DEFAULT_CAPACITY,
                  max_load_factor=DEFAULT_MAX_LOAD_FACTOR,
@@ -54,7 +53,7 @@ class HashTable:
         max_load_factor : resize when size / capacity would exceed this.
                           Pass None to disable resizing (fixed-size table).
         hash_function   : optional custom function f(key, capacity) -> index.
-                          Defaults to the polynomial string hash below.
+                          Defaults to _default_hash (division / Horner).
         """
         if capacity < 1:
             raise ValueError("capacity must be at least 1")
@@ -63,7 +62,7 @@ class HashTable:
 
         self._capacity = self._next_prime(capacity)
         self._max_load_factor = max_load_factor
-        self._hash_function = hash_function or self._polynomial_hash
+        self._hash_function = hash_function or self._default_hash
         self._slots = [_Slot() for _ in range(self._capacity)]
         self._size = 0          # number of OCCUPIED slots
         self._tombstones = 0    # number of DELETED slots
@@ -72,28 +71,43 @@ class HashTable:
     # ------------------------------------------------------------------ #
     # Hashing helpers
     # ------------------------------------------------------------------ #
-    @staticmethod
-    def _polynomial_hash(key, capacity):
-        """Polynomial rolling hash with a multiplicative mixing step.
+    @classmethod
+    def _default_hash(cls, key, capacity):
+        """Choose the hash method by key type.
 
-        Step 1 - polynomial hash over the characters of str(key):
-                 h = c0*31^(n-1) + c1*31^(n-2) + ... + c(n-1)   (kept to 32 bits)
-        Step 2 - mix the bits (Knuth's multiplicative method), so keys that
-                 differ only slightly (P1001, P1002, ...) are scattered across
-                 the table instead of landing in neighbouring slots. Without
-                 this, sequential IDs formed long clusters (primary clustering).
-        Step 3 - reduce to a slot index with mod capacity.
+        Integer keys use the division method; every other key is converted
+        to a string and hashed with Horner's method.
+        """
+        if isinstance(key, int):
+            return cls._division_hash(key, capacity)
+        return cls._polynomial_hash(str(key), capacity)
+
+    @staticmethod
+    def _division_hash(key, capacity):
+        """Division method: h(k) = k mod capacity.  O(1)."""
+        return key % capacity
+
+    @classmethod
+    def _polynomial_hash(cls, text, capacity):
+        """Horner's method for strings.
+
+        Treats the string as a polynomial in base B = HASH_BASE:
+            h = c0*B^(n-1) + c1*B^(n-2) + ... + c(n-1)   (mod capacity)
+        Horner's rule evaluates it with one multiply and one add per
+        character, taking mod capacity at every step so h stays small.
+
+        B must not equal the (prime) capacity: if it did, B^k mod capacity
+        would be 0 and only the last character would affect the slot.
+        _next_prime() therefore never returns HASH_BASE as a capacity.
 
         Written by hand instead of using Python's built-in hash(), because
         hash() of a string is randomised on every run, which would make slot
         numbers change between runs. Runs in O(L), L = length of the key.
         """
         h = 0
-        for ch in str(key):
-            h = (h * 31 + ord(ch)) & 0xFFFFFFFF   # & 0xFFFFFFFF keeps h within 32 bits
-        h = (h * 2654435761) & 0xFFFFFFFF          # Knuth's constant (about 2^32 / golden ratio)
-        h ^= h >> 16                               # fold high bits into the low bits
-        return h % capacity
+        for ch in text:
+            h = (h * cls.HASH_BASE + ord(ch)) % capacity
+        return h
 
     @staticmethod
     def _is_prime(n):
@@ -110,7 +124,8 @@ class HashTable:
 
     @classmethod
     def _next_prime(cls, n):
-        while not cls._is_prime(n):
+        """Smallest prime >= n, skipping HASH_BASE (see _polynomial_hash)."""
+        while not cls._is_prime(n) or n == cls.HASH_BASE:
             n += 1
         return n
 
@@ -161,13 +176,17 @@ class HashTable:
 
         Raises DuplicateKeyError if the key already exists (use update()).
         """
-        if self._max_load_factor is not None and \
-                (self._size + self._tombstones + 1) / self._capacity > self._max_load_factor:
-            self._resize(self._capacity * 2)
-
+        # 1. Reject duplicates first, so a failed insert never changes the table.
         found, free, _ = self._probe(key)
         if found is not None:
             raise DuplicateKeyError(f"key {key!r} already exists")
+
+        # 2. Only a genuinely new key may trigger a resize.
+        if self._max_load_factor is not None and \
+                (self._size + self._tombstones + 1) / self._capacity > self._max_load_factor:
+            self._resize(self._capacity * 2)
+            _, free, _ = self._probe(key)   # slots moved: find the new free slot
+
         if free is None:
             raise OverflowError("hash table is full")
 
