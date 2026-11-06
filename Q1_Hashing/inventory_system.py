@@ -197,10 +197,8 @@ class InventoryCLI:
         print(f"Search completed in {result['hash_ns'] / 1e9:.9f} seconds "
               f"({result['hash_ns']:,} ns) (Hash Table, {result['probes']} probe(s))")
         print(f"Search completed in {result['array_ns'] / 1e9:.9f} seconds "
-              f"({result['array_ns']:,} ns) (Array - same record, "
+              f"({result['array_ns']:,} ns) (Array, "
               f"{result['comparisons']} comparison(s))")
-        print("Note: a single search takes only microseconds, so these times vary "
-              "between runs; see experiment.py for averaged results.")
 
     # ---------------- 3. Edit (optional feature) ---------------- #
     def edit_product(self):

@@ -37,3 +37,5 @@ def load_products(table, array, products):
         array.append(product)                               # same data, same order
         placements.append((product, slot))
     return placements
+
+

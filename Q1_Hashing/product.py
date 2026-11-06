@@ -194,3 +194,5 @@ class HealthSupplement(Product):
     def extra_details(self):
         return [("Category", self.category),
                 ("Servings/Pack", self.servings_per_container)]
+
+
