@@ -12,7 +12,7 @@ Run:  python main.py
 
 from course import Course, CourseType
 from course_system import CoursePrerequisiteSystem
-from seed_data import createSampleSystem
+from seed_data import create_sample_system
 
 TITLE = "University Course Prerequisite System"
 EXIT_CHOICE = "0"
@@ -21,7 +21,7 @@ EXIT_CHOICE = "0"
 # ======================================================================
 # Input helpers (keep asking until the input is valid)
 # ======================================================================
-def promptText(message: str) -> str:
+def prompt_text(message: str) -> str:
     """Ask until a non-empty answer is given."""
     while True:
         value = input(message).strip()
@@ -30,7 +30,7 @@ def promptText(message: str) -> str:
         print("  Input cannot be empty. Please try again.")
 
 
-def promptInt(message: str, minimum: int, maximum: int) -> int:
+def prompt_int(message: str, minimum: int, maximum: int) -> int:
     """Ask until a whole number between minimum and maximum is given."""
     while True:
         value = input(message).strip()
@@ -43,7 +43,7 @@ def promptInt(message: str, minimum: int, maximum: int) -> int:
         print(f"  Please enter a whole number between {minimum} and {maximum}.")
 
 
-def promptCourseType() -> CourseType:
+def prompt_course_type() -> CourseType:
     """Ask until C (Core) or E (Elective) is given."""
     choices = {"C": CourseType.CORE, "E": CourseType.ELECTIVE}
     while True:
@@ -53,121 +53,121 @@ def promptCourseType() -> CourseType:
         print("  Please enter C or E.")
 
 
-def promptExistingCourse(system: CoursePrerequisiteSystem, message: str) -> Course:
+def prompt_existing_course(system: CoursePrerequisiteSystem, message: str) -> Course:
     """Ask for a course code and return the Course (ValueError if it does not exist)."""
-    return system.getCourse(promptText(message))
+    return system.get_course(prompt_text(message))
 
 
 # ======================================================================
 # Output helper
 # ======================================================================
-def printCourseList(header: str, courses: list, emptyMessage: str) -> None:
-    """Print a header followed by one course per line, or emptyMessage if none."""
+def print_course_list(header: str, courses: list, empty_message: str) -> None:
+    """Print a header followed by one course per line, or empty_message if none."""
     if not courses:
-        print(emptyMessage)
+        print(empty_message)
         return
     print(header)
     for course in courses:
-        print(f"  - {course.getCourseCode()} ({course.getCourseName()})")
+        print(f"  - {course.get_course_code()} ({course.get_course_name()})")
 
 
 # ======================================================================
 # Mandatory features
 # ======================================================================
-def viewAllCourses(system: CoursePrerequisiteSystem) -> None:
+def view_all_courses(system: CoursePrerequisiteSystem) -> None:
     """Mandatory a: display a list of all courses' names."""
-    courses = system.getAllCourses()
+    courses = system.get_all_courses()
     print(f"\nAvailable Courses ({len(courses)}):")
     for number, course in enumerate(courses, start=1):
         print(f"{number}. {course}")
 
 
-def viewCourseDetails(system: CoursePrerequisiteSystem) -> None:
+def view_course_details(system: CoursePrerequisiteSystem) -> None:
     """Mandatory b: show ALL details of one course, ignoring core/elective."""
-    course = promptExistingCourse(system, "Enter Course Code: ")
+    course = prompt_existing_course(system, "Enter Course Code: ")
     print("\nCourse Details:")
-    print(course.getFullDetails())
+    print(course.get_full_details())
 
 
-def viewPrerequisites(system: CoursePrerequisiteSystem) -> None:
+def view_prerequisites(system: CoursePrerequisiteSystem) -> None:
     """Mandatory c: list the prerequisites (incoming edges) of a course."""
-    course = promptExistingCourse(system, "Enter Course Code: ")
-    printCourseList(f"\nPrerequisites for {course}:",
-                    system.getPrerequisites(course.getCourseCode()),
+    course = prompt_existing_course(system, "Enter Course Code: ")
+    print_course_list(f"\nPrerequisites for {course}:",
+                    system.get_prerequisites(course.get_course_code()),
                     f"\n{course} has no prerequisites.")
 
 
-def viewUnlockedCourses(system: CoursePrerequisiteSystem) -> None:
+def view_unlocked_courses(system: CoursePrerequisiteSystem) -> None:
     """Mandatory d: list the courses unlocked by a course (outgoing edges)."""
-    course = promptExistingCourse(system, "Enter Course Code: ")
-    printCourseList(f"\nCourses unlocked by {course}:",
-                    system.getUnlockedCourses(course.getCourseCode()),
+    course = prompt_existing_course(system, "Enter Course Code: ")
+    print_course_list(f"\nCourses unlocked by {course}:",
+                    system.get_unlocked_courses(course.get_course_code()),
                     f"\n{course} does not unlock any course.")
 
 
 # ======================================================================
 # Optional (advanced) features
 # ======================================================================
-def viewCourseProfile(system: CoursePrerequisiteSystem) -> None:
+def view_course_profile(system: CoursePrerequisiteSystem) -> None:
     """Optional b: core shows all details, elective shows the name only."""
-    course = promptExistingCourse(system, "Enter Course Code: ")
+    course = prompt_existing_course(system, "Enter Course Code: ")
     print("\nCourse Profile:")
-    print(course.getProfile())
+    print(course.get_profile())
 
 
-def addNewCourse(system: CoursePrerequisiteSystem) -> None:
+def add_new_course(system: CoursePrerequisiteSystem) -> None:
     """Optional a: create a new course (new vertex) on demand."""
-    if system.getCourseCount() >= system.getMaxCourses():
-        print(f"\nCannot add a course: the maximum of {system.getMaxCourses()} "
+    if system.get_course_count() >= system.get_max_courses():
+        print(f"\nCannot add a course: the maximum of {system.get_max_courses()} "
               f"courses has been reached.")
         return
 
     # Check the code first, so the user is not asked for details that will be rejected.
-    code = Course.validateCode(promptText("Enter new Course Code: "))
-    if system.hasCourse(code):
+    code = Course.validate_code(prompt_text("Enter new Course Code: "))
+    if system.has_course(code):
         raise ValueError(f"Course code '{code}' already exists.")
 
-    name = promptText("Enter Course Name: ")
-    creditHours = promptInt(f"Enter Credit Hours ({Course.MIN_CREDIT_HOURS}-"
+    name = prompt_text("Enter Course Name: ")
+    credit_hours = prompt_int(f"Enter Credit Hours ({Course.MIN_CREDIT_HOURS}-"
                             f"{Course.MAX_CREDIT_HOURS}): ",
                             Course.MIN_CREDIT_HOURS, Course.MAX_CREDIT_HOURS)
-    courseType = promptCourseType()
+    course_type = prompt_course_type()
     description = input("Enter Description (optional): ")
 
-    course = Course(code, name, creditHours, courseType, description)
-    system.addCourse(course)
+    course = Course(code, name, credit_hours, course_type, description)
+    system.add_course(course)
     print(f"\nCourse '{course}' added successfully. "
-          f"({system.getCourseCount()}/{system.getMaxCourses()} courses)")
+          f"({system.get_course_count()}/{system.get_max_courses()} courses)")
 
 
-def addPrerequisiteToCourse(system: CoursePrerequisiteSystem) -> None:
+def add_prerequisite_to_course(system: CoursePrerequisiteSystem) -> None:
     """Optional c: course X adds course Y as a prerequisite (new edge Y -> X)."""
-    course = promptExistingCourse(system, "Enter Course Code (course X): ")
-    prerequisite = promptExistingCourse(system, "Enter Prerequisite Course Code (course Y): ")
+    course = prompt_existing_course(system, "Enter Course Code (course X): ")
+    prerequisite = prompt_existing_course(system, "Enter Prerequisite Course Code (course Y): ")
 
-    system.addPrerequisite(course.getCourseCode(), prerequisite.getCourseCode())
-    print(f"\n{prerequisite.getCourseCode()} is now a prerequisite of "
-          f"{course.getCourseCode()}.")
-    printCourseList(f"Updated prerequisites for {course}:",
-                    system.getPrerequisites(course.getCourseCode()), "")
+    system.add_prerequisite(course.get_course_code(), prerequisite.get_course_code())
+    print(f"\n{prerequisite.get_course_code()} is now a prerequisite of "
+          f"{course.get_course_code()}.")
+    print_course_list(f"Updated prerequisites for {course}:",
+                    system.get_prerequisites(course.get_course_code()), "")
 
 
-def removePrerequisiteFromCourse(system: CoursePrerequisiteSystem) -> None:
+def remove_prerequisite_from_course(system: CoursePrerequisiteSystem) -> None:
     """Optional d: course X removes course Y as a prerequisite (remove edge Y -> X)."""
-    course = promptExistingCourse(system, "Enter Course Code (course X): ")
-    current = system.getPrerequisites(course.getCourseCode())
+    course = prompt_existing_course(system, "Enter Course Code (course X): ")
+    current = system.get_prerequisites(course.get_course_code())
     if not current:
         print(f"\n{course} has no prerequisites to remove.")
         return
 
-    printCourseList(f"\nCurrent prerequisites for {course}:", current, "")
-    prerequisite = promptExistingCourse(system, "Enter Prerequisite Course Code to remove (course Y): ")
+    print_course_list(f"\nCurrent prerequisites for {course}:", current, "")
+    prerequisite = prompt_existing_course(system, "Enter Prerequisite Course Code to remove (course Y): ")
 
-    system.removePrerequisite(course.getCourseCode(), prerequisite.getCourseCode())
-    print(f"\n{prerequisite.getCourseCode()} has been removed as a prerequisite of "
-          f"{course.getCourseCode()}.")
-    printCourseList(f"Updated prerequisites for {course}:",
-                    system.getPrerequisites(course.getCourseCode()),
+    system.remove_prerequisite(course.get_course_code(), prerequisite.get_course_code())
+    print(f"\n{prerequisite.get_course_code()} has been removed as a prerequisite of "
+          f"{course.get_course_code()}.")
+    print_course_list(f"Updated prerequisites for {course}:",
+                    system.get_prerequisites(course.get_course_code()),
                     f"{course} now has no prerequisites.")
 
 
@@ -176,18 +176,18 @@ def removePrerequisiteFromCourse(system: CoursePrerequisiteSystem) -> None:
 # ======================================================================
 # choice -> (label, handler function). Adding a feature = adding one line here.
 MENU_OPTIONS = {
-    "1": ("View All Courses", viewAllCourses),
-    "2": ("View Course Details (All Information)", viewCourseDetails),
-    "3": ("View Prerequisites of a Course", viewPrerequisites),
-    "4": ("View Courses Unlocked by a Course", viewUnlockedCourses),
-    "5": ("View Course Profile (Core/Elective Visibility)", viewCourseProfile),
-    "6": ("Add a New Course", addNewCourse),
-    "7": ("Add a Prerequisite to a Course", addPrerequisiteToCourse),
-    "8": ("Remove a Prerequisite from a Course", removePrerequisiteFromCourse),
+    "1": ("View All Courses", view_all_courses),
+    "2": ("View Course Details (All Information)", view_course_details),
+    "3": ("View Prerequisites of a Course", view_prerequisites),
+    "4": ("View Courses Unlocked by a Course", view_unlocked_courses),
+    "5": ("View Course Profile (Core/Elective Visibility)", view_course_profile),
+    "6": ("Add a New Course", add_new_course),
+    "7": ("Add a Prerequisite to a Course", add_prerequisite_to_course),
+    "8": ("Remove a Prerequisite from a Course", remove_prerequisite_from_course),
 }
 
 
-def displayMenu() -> None:
+def display_menu() -> None:
     print(f"\n==== {TITLE} ====")
     for choice, (label, _) in MENU_OPTIONS.items():
         print(f"{choice}. {label}")
@@ -197,7 +197,7 @@ def displayMenu() -> None:
 def run(system: CoursePrerequisiteSystem) -> None:
     """Main loop: show menu -> read choice -> run the matching feature."""
     while True:
-        displayMenu()
+        display_menu()
         choice = input("Enter choice: ").strip()
 
         if choice == EXIT_CHOICE:
@@ -216,7 +216,7 @@ def run(system: CoursePrerequisiteSystem) -> None:
 
 
 def main() -> None:
-    system = createSampleSystem()
+    system = create_sample_system()
     try:
         run(system)
     except (KeyboardInterrupt, EOFError):

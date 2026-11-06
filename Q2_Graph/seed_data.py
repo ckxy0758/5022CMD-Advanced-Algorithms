@@ -51,15 +51,15 @@ PREREQUISITES = [
 ]
 
 
-def createSampleSystem() -> CoursePrerequisiteSystem:
+def create_sample_system() -> CoursePrerequisiteSystem:
     """Build a system loaded with the sample courses and prerequisites.
 
-    The data goes through the normal addCourse / addPrerequisite methods,
+    The data goes through the normal add_course / add_prerequisite methods,
     so it is validated by the same rules (no duplicates, no cycles).
     """
     system = CoursePrerequisiteSystem()
-    for code, name, credits, courseType, description in COURSES:
-        system.addCourse(Course(code, name, credits, courseType, description))
+    for code, name, credits, course_type, description in COURSES:
+        system.add_course(Course(code, name, credits, course_type, description))
     for prerequisite, course in PREREQUISITES:
-        system.addPrerequisite(course, prerequisite)
+        system.add_prerequisite(course, prerequisite)
     return system

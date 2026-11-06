@@ -30,7 +30,7 @@ class DirectedGraph:
     # ------------------------------------------------------------------
     # Vertex operations
     # ------------------------------------------------------------------
-    def addVertex(self, vertex: Hashable) -> None:
+    def add_vertex(self, vertex: Hashable) -> None:
         """Add a new vertex with no edges.
 
         Raises ValueError if the vertex already exists, so existing edges
@@ -41,19 +41,19 @@ class DirectedGraph:
         self._outgoing[vertex] = []
         self._incoming[vertex] = []
 
-    def hasVertex(self, vertex: Hashable) -> bool:
+    def has_vertex(self, vertex: Hashable) -> bool:
         """Return True if the vertex exists.  Time: O(1) average."""
         return vertex in self._outgoing
 
-    def getVertices(self) -> list:
+    def get_vertices(self) -> list:
         """Return all vertices (in insertion order).  Time: O(V)."""
         return list(self._outgoing)
 
     # ------------------------------------------------------------------
     # Edge operations
     # ------------------------------------------------------------------
-    def addEdge(self, fromVertex: Hashable, toVertex: Hashable) -> None:
-        """Add a directed edge fromVertex -> toVertex.
+    def add_edge(self, from_vertex: Hashable, to_vertex: Hashable) -> None:
+        """Add a directed edge from_vertex -> to_vertex.
 
         Rules (keep the graph a "simple graph", as defined in Chapter 5):
           * both vertices must already exist
@@ -61,33 +61,33 @@ class DirectedGraph:
           * no duplicate edge
         Time: O(1) average + O(out-degree) for the duplicate check.
         """
-        self._requireVertex(fromVertex)
-        self._requireVertex(toVertex)
-        if fromVertex == toVertex:
-            raise ValueError(f"Self-loop on '{fromVertex}' is not allowed.")
-        if self.hasEdge(fromVertex, toVertex):
-            raise ValueError(f"Edge '{fromVertex}' -> '{toVertex}' already exists.")
+        self._require_vertex(from_vertex)
+        self._require_vertex(to_vertex)
+        if from_vertex == to_vertex:
+            raise ValueError(f"Self-loop on '{from_vertex}' is not allowed.")
+        if self.has_edge(from_vertex, to_vertex):
+            raise ValueError(f"Edge '{from_vertex}' -> '{to_vertex}' already exists.")
 
         # Update BOTH dictionaries so they always stay consistent.
-        self._outgoing[fromVertex].append(toVertex)
-        self._incoming[toVertex].append(fromVertex)
+        self._outgoing[from_vertex].append(to_vertex)
+        self._incoming[to_vertex].append(from_vertex)
 
-    def removeEdge(self, fromVertex: Hashable, toVertex: Hashable) -> None:
-        """Remove the directed edge fromVertex -> toVertex.
+    def remove_edge(self, from_vertex: Hashable, to_vertex: Hashable) -> None:
+        """Remove the directed edge from_vertex -> to_vertex.
 
         Raises ValueError if the edge does not exist.  Time: O(degree).
         """
-        if not self.hasEdge(fromVertex, toVertex):
-            raise ValueError(f"Edge '{fromVertex}' -> '{toVertex}' does not exist.")
-        self._outgoing[fromVertex].remove(toVertex)
-        self._incoming[toVertex].remove(fromVertex)
+        if not self.has_edge(from_vertex, to_vertex):
+            raise ValueError(f"Edge '{from_vertex}' -> '{to_vertex}' does not exist.")
+        self._outgoing[from_vertex].remove(to_vertex)
+        self._incoming[to_vertex].remove(from_vertex)
 
-    def hasEdge(self, fromVertex: Hashable, toVertex: Hashable) -> bool:
-        """Return True if the edge fromVertex -> toVertex exists.  Time: O(out-degree)."""
-        return fromVertex in self._outgoing and toVertex in self._outgoing[fromVertex]
+    def has_edge(self, from_vertex: Hashable, to_vertex: Hashable) -> bool:
+        """Return True if the edge from_vertex -> to_vertex exists.  Time: O(out-degree)."""
+        return from_vertex in self._outgoing and to_vertex in self._outgoing[from_vertex]
 
-    def getEdges(self) -> list:
-        """Return every edge as a (fromVertex, toVertex) tuple.  Time: O(V + E)."""
+    def get_edges(self) -> list:
+        """Return every edge as a (from_vertex, to_vertex) tuple.  Time: O(V + E)."""
         return [(source, target)
                 for source, targets in self._outgoing.items()
                 for target in targets]
@@ -95,27 +95,27 @@ class DirectedGraph:
     # ------------------------------------------------------------------
     # Neighbour queries
     # ------------------------------------------------------------------
-    def listIncomingAdjacentVertex(self, vertex: Hashable) -> list:
+    def list_incoming_adjacent_vertex(self, vertex: Hashable) -> list:
         """Return all vertices that have an edge INTO the given vertex.
 
         A copy is returned so callers cannot modify the graph's internal
         data by accident.  Time: O(in-degree).
         """
-        self._requireVertex(vertex)
+        self._require_vertex(vertex)
         return list(self._incoming[vertex])
 
-    def listOutgoingAdjacentVertex(self, vertex: Hashable) -> list:
+    def list_outgoing_adjacent_vertex(self, vertex: Hashable) -> list:
         """Return all vertices that the given vertex has an edge TO.
 
         Returns a copy.  Time: O(out-degree).
         """
-        self._requireVertex(vertex)
+        self._require_vertex(vertex)
         return list(self._outgoing[vertex])
 
     # ------------------------------------------------------------------
     # Traversal
     # ------------------------------------------------------------------
-    def hasPath(self, start: Hashable, target: Hashable) -> bool:
+    def has_path(self, start: Hashable, target: Hashable) -> bool:
         """Return True if target can be reached from start by following edges.
 
         Uses an iterative Depth-First Search (DFS, Chapter 5) with an explicit
@@ -123,8 +123,8 @@ class DirectedGraph:
         A vertex is always considered reachable from itself.
         Time: O(V + E).  Space: O(V).
         """
-        self._requireVertex(start)
-        self._requireVertex(target)
+        self._require_vertex(start)
+        self._require_vertex(target)
 
         visited = set()
         stack = [start]
@@ -150,7 +150,7 @@ class DirectedGraph:
         return "\n".join(f"{vertex} -> {targets}"
                          for vertex, targets in self._outgoing.items())
 
-    def _requireVertex(self, vertex: Hashable) -> None:
+    def _require_vertex(self, vertex: Hashable) -> None:
         """Raise ValueError if the vertex is not in the graph (internal helper)."""
         if vertex not in self._outgoing:
             raise ValueError(f"Vertex '{vertex}' does not exist in the graph.")

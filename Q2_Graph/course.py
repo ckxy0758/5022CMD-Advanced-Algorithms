@@ -18,72 +18,72 @@ class Course:
     """Represents a single course offered by a university.
 
     The attributes are validated once in the constructor and exposed through
-    getters only (no setters). In particular, courseCode must never change,
+    getters only (no setters). In particular, course_code must never change,
     because it is used as the vertex key in the prerequisite graph.
     """
 
     MIN_CREDIT_HOURS = 1
     MAX_CREDIT_HOURS = 6
 
-    def __init__(self, courseCode: str, courseName: str, creditHours: int,
-                 courseType: CourseType, description: str = ""):
-        self._courseCode = self.validateCode(courseCode)
-        self._courseName = self._validateName(courseName)
-        self._creditHours = self._validateCreditHours(creditHours)
-        self._courseType = self._validateCourseType(courseType)
+    def __init__(self, course_code: str, course_name: str, credit_hours: int,
+                 course_type: CourseType, description: str = ""):
+        self._course_code = self.validate_code(course_code)
+        self._course_name = self._validate_name(course_name)
+        self._credit_hours = self._validate_credit_hours(credit_hours)
+        self._course_type = self._validate_course_type(course_type)
         self._description = description.strip() if isinstance(description, str) else ""
 
     # ------------------------------------------------------------------
     # Getters
     # ------------------------------------------------------------------
-    def getCourseCode(self) -> str:
-        return self._courseCode
+    def get_course_code(self) -> str:
+        return self._course_code
 
-    def getCourseName(self) -> str:
-        return self._courseName
+    def get_course_name(self) -> str:
+        return self._course_name
 
-    def getCreditHours(self) -> int:
-        return self._creditHours
+    def get_credit_hours(self) -> int:
+        return self._credit_hours
 
-    def getCourseType(self) -> CourseType:
-        return self._courseType
+    def get_course_type(self) -> CourseType:
+        return self._course_type
 
-    def getDescription(self) -> str:
+    def get_description(self) -> str:
         return self._description
 
-    def isCore(self) -> bool:
-        return self._courseType == CourseType.CORE
+    def is_core(self) -> bool:
+        return self._course_type == CourseType.CORE
 
     # ------------------------------------------------------------------
     # Display
     # ------------------------------------------------------------------
-    def getFullDetails(self) -> str:
+    def get_full_details(self) -> str:
         """All information, ignoring visibility (Mandatory feature b)."""
-        return (f"Course Code  : {self._courseCode}\n"
-                f"Course Name  : {self._courseName}\n"
-                f"Credit Hours : {self._creditHours}\n"
-                f"Course Type  : {self._courseType.value}\n"
+        return (f"Course Code  : {self._course_code}\n"
+                f"Course Name  : {self._course_name}\n"
+                f"Credit Hours : {self._credit_hours}\n"
+                f"Course Type  : {self._course_type.value}\n"
                 f"Description  : {self._description or '-'}")
 
-    def getProfile(self) -> str:
+    def get_profile(self) -> str:
         """Visibility-aware profile (Optional feature b).
 
         Core courses show all details; elective courses show the name only.
         """
-        if self.isCore():
-            return self.getFullDetails()
-        return (f"Course Name  : {self._courseName}\n"
+        if self.is_core():
+            return self.get_full_details()
+        return (f"Course Name  : {self._course_name}\n"
                 f"(Elective course - other details are hidden)")
 
     def __str__(self) -> str:
         """Short one-line form, e.g. 'CS201 - Data Structures'."""
-        return f"{self._courseCode} - {self._courseName}"
+        return f"{self._course_code} - {self._course_name}"
 
     # ------------------------------------------------------------------
     # Validation helpers (internal)
     # ------------------------------------------------------------------
     @staticmethod
-    def validateCode(code) -> str:
+    def validate_code(code) -> str:
         """Validate and normalise a course code. Public so the menu can check a
         new code BEFORE asking for the other details."""
         if not isinstance(code, str):
@@ -94,13 +94,13 @@ class Course:
         return code
 
     @staticmethod
-    def _validateName(name) -> str:
+    def _validate_name(name) -> str:
         if not isinstance(name, str) or not name.strip():
             raise ValueError("Course name cannot be empty.")
         return name.strip()
 
     @classmethod
-    def _validateCreditHours(cls, hours) -> int:
+    def _validate_credit_hours(cls, hours) -> int:
         # bool is a subclass of int in Python (True == 1), so reject it explicitly.
         if isinstance(hours, bool) or not isinstance(hours, int):
             raise ValueError("Credit hours must be a whole number.")
@@ -110,7 +110,7 @@ class Course:
         return hours
 
     @staticmethod
-    def _validateCourseType(courseType) -> CourseType:
-        if not isinstance(courseType, CourseType):
+    def _validate_course_type(course_type) -> CourseType:
+        if not isinstance(course_type, CourseType):
             raise ValueError("Course type must be CourseType.CORE or CourseType.ELECTIVE.")
-        return courseType
+        return course_type
