@@ -1,0 +1,81 @@
+
+===============================================================================================
+Test Environment
+===============================================================================================
+Python version  : 3.14.7 (CPython)
+GIL             : Enabled
+Operating system: Windows-11-10.0.26200-SP0
+Logical CPUs    : 16
+Timer           : time.perf_counter_ns() (monotonic=True, resolution=1e-07 s)
+
+===============================================================================================
+Fibonacci Computation (With Multithreading)
+===============================================================================================
+Round  1 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,446,319,500 ns
+Round  2 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,606,726,000 ns
+Round  3 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,581,473,400 ns
+Round  4 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,451,658,900 ns
+Round  5 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,331,661,600 ns
+Round  6 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,333,458,400 ns
+Round  7 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,276,793,200 ns
+Round  8 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,434,908,600 ns
+Round  9 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,492,406,800 ns
+Round 10 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,361,556,000 ns
+Average T (With Multithreading) : 16,431,696,240 ns
+
+Round 1 timeline - With Multithreading (offsets relative to t1, the earliest start):
+  Task                Start offset            End offset              Duration
+  Fib(35)                     0 ns      3,039,556,900 ns      3,039,556,900 ns
+  Fib(38)            21,592,700 ns      9,646,036,200 ns      9,624,443,500 ns
+  Fib(40)            84,088,100 ns     16,446,319,500 ns     16,362,231,400 ns
+  T = t2 - t1 = 16,446,319,500 ns
+
+===============================================================================================
+Fibonacci Computation (Without Multithreading)
+===============================================================================================
+Round  1 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,228,118,300 ns
+Round  2 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,421,444,900 ns
+Round  3 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,635,507,800 ns
+Round  4 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,384,220,100 ns
+Round  5 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,238,215,600 ns
+Round  6 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,157,222,000 ns
+Round  7 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,231,291,600 ns
+Round  8 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,164,509,100 ns
+Round  9 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,290,909,000 ns
+Round 10 : Fib(35)=9227465, Fib(38)=39088169, Fib(40)=102334155 | T =    16,253,563,300 ns
+Average T (Without Multithreading) : 16,300,500,170 ns
+
+Round 1 timeline - Without Multithreading (offsets relative to t1, the earliest start):
+  Task                Start offset            End offset              Duration
+  Fib(35)                     0 ns        992,316,800 ns        992,316,800 ns
+  Fib(38)           992,327,300 ns      5,304,920,300 ns      4,312,593,000 ns
+  Fib(40)         5,304,939,900 ns     16,228,118,300 ns     10,923,178,400 ns
+  T = t2 - t1 = 16,228,118,300 ns
+
+===============================================================================================
+Summary (10 rounds each)
+===============================================================================================
+Metric                         With Multithreading        Without Multithreading
+--------------------------------------------------------------------------------
+Average T                        16,431,696,240 ns             16,300,500,170 ns
+Minimum T                        16,276,793,200 ns             16,157,222,000 ns
+Maximum T                        16,606,726,000 ns             16,635,507,800 ns
+Std deviation                       108,499,494 ns                144,949,172 ns
+--------------------------------------------------------------------------------
+Speed-up (sequential average / multithreaded average): 0.992x
+
+Observation: Multithreading made a negligible difference to the average completion time (+0.80%).
+
+===============================================================================================
+Demonstration: I/O-bound tasks (simulated with time.sleep)
+===============================================================================================
+Each task waits 1.0s, 1.0s, 1.0s - like waiting for downloads.
+
+Round 1: With Multithreading T =     1,000,572,700 ns | Without Multithreading T =     3,000,802,800 ns
+Round 2: With Multithreading T =     1,000,626,000 ns | Without Multithreading T =     3,000,819,200 ns
+Round 3: With Multithreading T =     1,000,485,300 ns | Without Multithreading T =     3,000,691,800 ns
+
+Average T (With Multithreading)    : 1,000,561,333 ns
+Average T (Without Multithreading) : 3,000,771,267 ns
+Speed-up: 2.999x
+Observation: Multithreading reduced the average completion time by approximately 66.66%.
