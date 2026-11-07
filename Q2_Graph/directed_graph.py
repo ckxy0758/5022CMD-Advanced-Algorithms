@@ -30,7 +30,7 @@ class DirectedGraph:
     # ------------------------------------------------------------------
     # Vertex operations
     # ------------------------------------------------------------------
-    def add_vertex(self, vertex: Hashable) -> None:
+    def addVertex(self, vertex: Hashable) -> None:
         """Add a new vertex with no edges.
 
         Raises ValueError if the vertex already exists, so existing edges
@@ -52,7 +52,7 @@ class DirectedGraph:
     # ------------------------------------------------------------------
     # Edge operations
     # ------------------------------------------------------------------
-    def add_edge(self, from_vertex: Hashable, to_vertex: Hashable) -> None:
+    def addEdge(self, from_vertex: Hashable, to_vertex: Hashable) -> None:
         """Add a directed edge from_vertex -> to_vertex.
 
         Rules (keep the graph a "simple graph", as defined in Chapter 5):
@@ -95,7 +95,7 @@ class DirectedGraph:
     # ------------------------------------------------------------------
     # Neighbour queries
     # ------------------------------------------------------------------
-    def list_incoming_adjacent_vertex(self, vertex: Hashable) -> list:
+    def listIncomingAdjacentVertex(self, vertex: Hashable) -> list:
         """Return all vertices that have an edge INTO the given vertex.
 
         A copy is returned so callers cannot modify the graph's internal
@@ -119,24 +119,23 @@ class DirectedGraph:
         """Return True if target can be reached from start by following edges.
 
         Uses an iterative Depth-First Search (DFS, Chapter 5) with an explicit
-        stack and a visited set, so each vertex is processed at most once.
+        stack and a visited set. A vertex is marked as visited when it is
+        pushed, so each vertex enters the stack at most once.
         A vertex is always considered reachable from itself.
         Time: O(V + E).  Space: O(V).
         """
         self._require_vertex(start)
         self._require_vertex(target)
 
-        visited = set()
+        visited = {start}
         stack = [start]
         while stack:
             current = stack.pop()            # LIFO -> depth-first
             if current == target:
                 return True
-            if current in visited:
-                continue
-            visited.add(current)
             for neighbour in self._outgoing[current]:
                 if neighbour not in visited:
+                    visited.add(neighbour)   # mark on push -> pushed at most once
                     stack.append(neighbour)
         return False
 

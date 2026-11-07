@@ -72,8 +72,7 @@ class Course:
         """
         if self.is_core():
             return self.get_full_details()
-        return (f"Course Name  : {self._course_name}\n"
-                f"(Elective course - other details are hidden)")
+        return f"Course Name  : {self._course_name}"
 
     def __str__(self) -> str:
         """Short one-line form, e.g. 'CS201 - Data Structures'."""

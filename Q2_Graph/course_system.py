@@ -48,7 +48,7 @@ class CoursePrerequisiteSystem:
         if code in self._courses:
             raise ValueError(f"Course code '{code}' already exists.")
 
-        self._graph.add_vertex(code)
+        self._graph.addVertex(code)
         self._courses[code] = course
 
     def has_course(self, code: str) -> bool:
@@ -77,7 +77,7 @@ class CoursePrerequisiteSystem:
     def get_prerequisites(self, code: str) -> list:
         """Courses required BEFORE this course (incoming edges). Time: O(in-degree)."""
         course = self.get_course(code)
-        codes = self._graph.list_incoming_adjacent_vertex(course.get_course_code())
+        codes = self._graph.listIncomingAdjacentVertex(course.get_course_code())
         return [self._courses[c] for c in codes]
 
     def get_unlocked_courses(self, code: str) -> list:
@@ -110,7 +110,7 @@ class CoursePrerequisiteSystem:
                              f"{course} is already required (directly or indirectly) "
                              f"before {prerequisite}, so this would create a cycle.")
 
-        self._graph.add_edge(prerequisite, course)
+        self._graph.addEdge(prerequisite, course)
 
     def remove_prerequisite(self, course_code: str, prerequisite_code: str) -> None:
         """Remove prerequisite_code (Y) from course_code (X): removes edge Y -> X."""

@@ -16,25 +16,25 @@ class TestVertexOperations(unittest.TestCase):
         self.graph = DirectedGraph()
 
     def test_add_vertex(self):
-        self.graph.add_vertex("A")
+        self.graph.addVertex("A")
         self.assertTrue(self.graph.has_vertex("A"))
         self.assertEqual(self.graph.get_vertices(), ["A"])
 
     def test_add_duplicate_vertex_raises_error(self):
-        self.graph.add_vertex("A")
+        self.graph.addVertex("A")
         with self.assertRaises(ValueError):
-            self.graph.add_vertex("A")
+            self.graph.addVertex("A")
 
     def test_graph_is_generic(self):
         # Works with any hashable type, not just strings (reusability).
-        self.graph.add_vertex(1)
-        self.graph.add_vertex(2)
-        self.graph.add_edge(1, 2)
-        self.assertEqual(self.graph.list_incoming_adjacent_vertex(2), [1])
+        self.graph.addVertex(1)
+        self.graph.addVertex(2)
+        self.graph.addEdge(1, 2)
+        self.assertEqual(self.graph.listIncomingAdjacentVertex(2), [1])
 
     def test_new_vertex_has_no_neighbours(self):
-        self.graph.add_vertex("A")
-        self.assertEqual(self.graph.list_incoming_adjacent_vertex("A"), [])
+        self.graph.addVertex("A")
+        self.assertEqual(self.graph.listIncomingAdjacentVertex("A"), [])
         self.assertEqual(self.graph.list_outgoing_adjacent_vertex("A"), [])
 
 
@@ -44,18 +44,18 @@ class TestEdgeOperations(unittest.TestCase):
         # A -> B, A -> C, B -> C
         self.graph = DirectedGraph()
         for vertex in ("A", "B", "C"):
-            self.graph.add_vertex(vertex)
-        self.graph.add_edge("A", "B")
-        self.graph.add_edge("A", "C")
-        self.graph.add_edge("B", "C")
+            self.graph.addVertex(vertex)
+        self.graph.addEdge("A", "B")
+        self.graph.addEdge("A", "C")
+        self.graph.addEdge("B", "C")
 
     def test_edge_is_directed(self):
         self.assertTrue(self.graph.has_edge("A", "B"))
         self.assertFalse(self.graph.has_edge("B", "A"))
 
     def test_list_incoming_adjacent_vertex(self):
-        self.assertEqual(self.graph.list_incoming_adjacent_vertex("C"), ["A", "B"])
-        self.assertEqual(self.graph.list_incoming_adjacent_vertex("A"), [])
+        self.assertEqual(self.graph.listIncomingAdjacentVertex("C"), ["A", "B"])
+        self.assertEqual(self.graph.listIncomingAdjacentVertex("A"), [])
 
     def test_list_outgoing_adjacent_vertex(self):
         self.assertEqual(self.graph.list_outgoing_adjacent_vertex("A"), ["B", "C"])
@@ -66,23 +66,23 @@ class TestEdgeOperations(unittest.TestCase):
 
     def test_add_edge_with_missing_vertex_raises_error(self):
         with self.assertRaises(ValueError):
-            self.graph.add_edge("A", "Z")
+            self.graph.addEdge("A", "Z")
         with self.assertRaises(ValueError):
-            self.graph.add_edge("Z", "A")
+            self.graph.addEdge("Z", "A")
 
     def test_self_loop_raises_error(self):
         with self.assertRaises(ValueError):
-            self.graph.add_edge("A", "A")
+            self.graph.addEdge("A", "A")
 
     def test_duplicate_edge_raises_error(self):
         with self.assertRaises(ValueError):
-            self.graph.add_edge("A", "B")
+            self.graph.addEdge("A", "B")
 
     def test_remove_edge_updates_both_directions(self):
         self.graph.remove_edge("A", "C")
         self.assertFalse(self.graph.has_edge("A", "C"))
         self.assertEqual(self.graph.list_outgoing_adjacent_vertex("A"), ["B"])
-        self.assertEqual(self.graph.list_incoming_adjacent_vertex("C"), ["B"])
+        self.assertEqual(self.graph.listIncomingAdjacentVertex("C"), ["B"])
 
     def test_remove_missing_edge_raises_error(self):
         with self.assertRaises(ValueError):
@@ -90,13 +90,13 @@ class TestEdgeOperations(unittest.TestCase):
 
     def test_returned_list_is_a_copy(self):
         # Changing the returned list must NOT change the graph (encapsulation).
-        incoming = self.graph.list_incoming_adjacent_vertex("C")
+        incoming = self.graph.listIncomingAdjacentVertex("C")
         incoming.append("X")
-        self.assertEqual(self.graph.list_incoming_adjacent_vertex("C"), ["A", "B"])
+        self.assertEqual(self.graph.listIncomingAdjacentVertex("C"), ["A", "B"])
 
     def test_query_missing_vertex_raises_error(self):
         with self.assertRaises(ValueError):
-            self.graph.list_incoming_adjacent_vertex("Z")
+            self.graph.listIncomingAdjacentVertex("Z")
 
 
 class TestHasPath(unittest.TestCase):
@@ -105,9 +105,9 @@ class TestHasPath(unittest.TestCase):
         # A -> B -> C,   D is isolated
         self.graph = DirectedGraph()
         for vertex in ("A", "B", "C", "D"):
-            self.graph.add_vertex(vertex)
-        self.graph.add_edge("A", "B")
-        self.graph.add_edge("B", "C")
+            self.graph.addVertex(vertex)
+        self.graph.addEdge("A", "B")
+        self.graph.addEdge("B", "C")
 
     def test_direct_path(self):
         self.assertTrue(self.graph.has_path("A", "B"))
