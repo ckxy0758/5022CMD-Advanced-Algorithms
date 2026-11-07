@@ -142,8 +142,10 @@ def add_new_course(system: CoursePrerequisiteSystem) -> None:
 
 def add_prerequisite_to_course(system: CoursePrerequisiteSystem) -> None:
     """Optional c: course X adds course Y as a prerequisite (new edge Y -> X)."""
-    course = prompt_existing_course(system, "Enter Course Code (course X): ")
-    prerequisite = prompt_existing_course(system, "Enter Prerequisite Course Code (course Y): ")
+    course = prompt_existing_course(
+        system, "Enter the code of Course X (the course that needs the prerequisite): ")
+    prerequisite = prompt_existing_course(
+        system, "Enter the code of Course Y (the prerequisite to be completed first): ")
 
     system.add_prerequisite(course.get_course_code(), prerequisite.get_course_code())
     print(f"\n{prerequisite.get_course_code()} is now a prerequisite of "
@@ -154,14 +156,16 @@ def add_prerequisite_to_course(system: CoursePrerequisiteSystem) -> None:
 
 def remove_prerequisite_from_course(system: CoursePrerequisiteSystem) -> None:
     """Optional d: course X removes course Y as a prerequisite (remove edge Y -> X)."""
-    course = prompt_existing_course(system, "Enter Course Code (course X): ")
+    course = prompt_existing_course(
+        system, "Enter the code of Course X (the course whose prerequisite will be removed): ")
     current = system.get_prerequisites(course.get_course_code())
     if not current:
         print(f"\n{course} has no prerequisites to remove.")
         return
 
     print_course_list(f"\nCurrent prerequisites for {course}:", current, "")
-    prerequisite = prompt_existing_course(system, "Enter Prerequisite Course Code to remove (course Y): ")
+    prerequisite = prompt_existing_course(
+        system, "Enter the code of Course Y (the prerequisite to remove): ")
 
     system.remove_prerequisite(course.get_course_code(), prerequisite.get_course_code())
     print(f"\n{prerequisite.get_course_code()} has been removed as a prerequisite of "

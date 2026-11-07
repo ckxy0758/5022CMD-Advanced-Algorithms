@@ -98,7 +98,7 @@ class DirectedGraph:
     def listIncomingAdjacentVertex(self, vertex: Hashable) -> list:
         """Return all vertices that have an edge INTO the given vertex.
 
-        A copy is returned so callers cannot modify the graph's internal
+        A copy is returne d so callers cannot modify the graph's internal
         data by accident.  Time: O(in-degree).
         """
         self._require_vertex(vertex)
