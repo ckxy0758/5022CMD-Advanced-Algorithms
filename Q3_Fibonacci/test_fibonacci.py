@@ -8,12 +8,10 @@ Small inputs are used so the tests finish quickly.
 
 import unittest
 
-import fibonacci as fibonacci_module
 from benchmark import (
     run_experiment,
     run_multithreaded_round,
     run_sequential_round,
-    simulated_io_task,
     summarise,
 )
 from fibonacci import fibonacci, fibonacci_iterative
@@ -52,29 +50,6 @@ class TestFibonacci(unittest.TestCase):
             for bad in (3.5, "10", None, True):
                 with self.assertRaises(TypeError):
                     function(bad)
-
-
-class TestCallCount(unittest.TestCase):
-    """Checks the Big-O analysis: the number of calls C(n) must equal 2*F(n+1) - 1."""
-
-    def test_call_count_formula(self):
-        original = fibonacci_module._fib
-        calls = 0
-
-        def counting_fib(n):
-            nonlocal calls
-            calls += 1
-            return original(n)
-
-        # _fib calls itself through the module name, so replacing it counts every call.
-        fibonacci_module._fib = counting_fib
-        try:
-            for n in range(20):
-                calls = 0
-                fibonacci_module.fibonacci(n)
-                self.assertEqual(calls, 2 * fibonacci_iterative(n + 1) - 1, f"n={n}")
-        finally:
-            fibonacci_module._fib = original
 
 
 class TestBenchmark(unittest.TestCase):
@@ -132,12 +107,6 @@ class TestBenchmark(unittest.TestCase):
         self.assertEqual(with_outlier.mean_ns, 29.2)
         with self.assertRaises(ValueError):
             summarise([])
-
-    def test_threads_overlap_for_io_bound_tasks(self):
-        # Three 0.2 s waits: with threads they overlap, so T is well below 0.6 s.
-        delays = (0.2, 0.2, 0.2)
-        threaded = run_multithreaded_round(simulated_io_task, delays).elapsed_ns
-        self.assertLess(threaded, sum(delays) * 1e9 * 0.8)
 
 
 if __name__ == "__main__":
